@@ -1,9 +1,8 @@
 {
-  "name": "netflix-cookie-parser-vercel",
+  "name": "netflix-token-scraper",
   "version": "1.0.0",
   "private": true,
-  "description": "A privacy-conscious cookie format parser web app",
   "engines": {
-    "node": ">=18"
+    "node": ">=18.0.0"
   }
 }
