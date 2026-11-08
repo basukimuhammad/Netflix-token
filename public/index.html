@@ -1,118 +1,103 @@
 <!doctype html>
 <html lang="id">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#101010">
-  <title>Cookie Parser — Web Tool</title>
-  <style>
-    * { box-sizing: border-box; }
-    body {
-      margin: 0; min-height: 100vh; padding: 24px 16px;
-      display: grid; place-items: center;
-      background: radial-gradient(circle at top, #292020, #101010 55%);
-      color: #f5f5f5; font-family: system-ui, Arial, sans-serif;
-    }
-    .card {
-      width: min(100%, 520px); padding: 26px;
-      background: #191919; border: 1px solid #353535;
-      border-radius: 20px; box-shadow: 0 18px 60px #0008;
-    }
-    .brand { color: #e50914; font-size: 13px; font-weight: 800; letter-spacing: 3px; }
-    h1 { margin: 8px 0 6px; font-size: 25px; }
-    .muted { color: #aaa; font-size: 13px; line-height: 1.6; }
-    label { display: block; margin: 22px 0 8px; font-size: 13px; font-weight: 650; }
-    textarea {
-      width: 100%; min-height: 155px; resize: vertical; padding: 14px;
-      color: #fff; background: #101010; border: 1px solid #444;
-      border-radius: 12px; outline: none; font: 13px/1.5 ui-monospace, monospace;
-    }
-    textarea:focus { border-color: #e50914; }
-    button {
-      width: 100%; border: 0; border-radius: 11px; padding: 14px;
-      margin-top: 12px; color: white; background: #e50914;
-      font-weight: 750; cursor: pointer;
-    }
-    button.secondary { background: #333; }
-    button:disabled { opacity: .6; cursor: wait; }
-    .result, .error {
-      display: none; margin-top: 18px; padding: 14px;
-      border-radius: 12px; font-size: 13px; overflow-wrap: anywhere;
-    }
-    .result { background: #12301f; border: 1px solid #245b39; }
-    .error { background: #351719; border: 1px solid #713035; color: #ffb8bc; }
-    .result strong { color: #8ff0ad; }
-    .privacy { margin-top: 18px; padding-top: 14px; border-top: 1px solid #333; }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Netflix Token Generator</title>
+<style>
+:root{color-scheme:dark;font-family:system-ui,Arial,sans-serif}*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:#0d1117;color:#e6edf3;padding:24px 14px;display:flex;flex-direction:column;justify-content:center}
+main{max-width:600px;margin:0 auto;width:100%}
+.panel{background:#161b22;border:1px solid #30363d;border-radius:18px;padding:23px;box-shadow:0 18px 55px #0005}
+h1{font-size:22px;margin:0 0 10px}
+p.muted{color:#8b949e;font-size:13px;line-height:1.6;margin-bottom:20px}
+label{display:block;font-size:13px;font-weight:700;margin:15px 0 7px}
+textarea{width:100%;height:120px;padding:13px 14px;border-radius:10px;border:1px solid #30363d;background:#0d1117;color:#e6edf3;outline:none;font-family:monospace;font-size:12px;resize:vertical}
+textarea:focus{border-color:#2f81f7}
+button{width:100%;border:0;border-radius:10px;padding:14px;margin-top:19px;background:#238636;color:white;font-weight:800;font-size:14px;cursor:pointer;transition:0.2s}
+button:hover{background:#2ea043}
+button:disabled{opacity:.55;cursor:wait;background:#238636}
+.status{display:none;margin-top:15px;padding:13px;border-radius:10px;font-size:13px;line-height:1.55;overflow-wrap:anywhere}
+.status.ok{display:block;background:#10251a;border:1px solid #238636}
+.status.err{display:block;background:#2d1518;border:1px solid #da3633}
+.result-box{background:#0d1117;border:1px solid #30363d;padding:12px;border-radius:8px;margin-top:10px;word-break:break-all}
+.result-box a{color:#58a6ff;text-decoration:none;font-weight:bold}
+.result-box a:hover{text-decoration:underline}
+footer{color:#6e7681;text-align:center;font-size:11px;margin-top:20px;line-height:1.6}
+footer a{color:#8b949e}
+</style>
 </head>
 <body>
-  <main class="card">
-    <div class="brand">WEB TOOL</div>
-    <h1>Cookie Parser</h1>
-    <div class="muted">Parser format cookie untuk penggunaan dan pengujian yang sah.</div>
+<main>
+    <section class="panel">
+        <h1>🍿 Netflix Token Generator</h1>
+        <p class="muted">Masukkan Cookie Netflix kamu (format Netscape, JSON, atau raw string seperti <code>NetflixId=...</code>) di bawah ini untuk mengekstrak token login.</p>
 
-    <label for="cookie">Masukkan cookie</label>
-    <textarea id="cookie" autocomplete="off" autocapitalize="off"
-      spellcheck="false" placeholder="NetflixId=...; SecureNetflixId=..."></textarea>
+        <label for="cookieInput">Cookie Netflix</label>
+        <textarea id="cookieInput" placeholder="NetflixId=...; SecureNetflixId=...; nfvdid=..."></textarea>
 
-    <button id="parseBtn" type="button">VALIDATE COOKIE</button>
-    <button class="secondary" id="clearBtn" type="button">CLEAR INPUT</button>
+        <button id="generateBtn">EKSTRAK TOKEN</button>
 
-    <div class="error" id="error" role="alert"></div>
-    <section class="result" id="result" aria-live="polite">
-      <strong>✓ Cookie berhasil dibaca</strong>
-      <p id="count"></p>
-      <p id="keys"></p>
+        <div class="status" id="status"></div>
     </section>
 
-    <div class="muted privacy">
-      Privasi: aplikasi ini hanya memeriksa nama cookie, tidak menampilkan atau
-      menyimpan nilainya. Jangan masukkan cookie akun yang bukan milikmu.
-    </div>
-  </main>
+    <footer>
+        Original Script by <a href="https://github.com/harshitkamboj" target="_blank">harshitkamboj</a><br>
+        website: harshitkamboj.in | discord: https://discord.gg/DYJFE9nu5X
+    </footer>
+</main>
 
-  <script>
-    const input = document.getElementById("cookie");
-    const button = document.getElementById("parseBtn");
-    const errorBox = document.getElementById("error");
-    const resultBox = document.getElementById("result");
+<script>
+const btn = document.getElementById('generateBtn');
+const input = document.getElementById('cookieInput');
+const statusBox = document.getElementById('status');
 
-    button.addEventListener("click", async () => {
-      errorBox.style.display = "none";
-      resultBox.style.display = "none";
-      button.disabled = true;
-      button.textContent = "MEMERIKSA...";
+btn.addEventListener('click', async () => {
+    const rawCookie = input.value.trim();
+    if (!rawCookie) {
+        showStatus('Silakan masukkan cookie terlebih dahulu.', 'err');
+        return;
+    }
 
-      try {
-        const response = await fetch("/api/parse", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          cache: "no-store",
-          body: JSON.stringify({ cookie: input.value })
+    btn.disabled = true;
+    btn.textContent = 'MEMPROSES...';
+    showStatus('Menghubungi API Netflix...', 'info');
+
+    try {
+        const response = await fetch('/api/generate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ rawCookie })
         });
 
         const data = await response.json();
-        if (!response.ok) throw new Error(data.message || "Permintaan gagal.");
 
-        document.getElementById("count").textContent =
-          "Cookie dikenali: " + data.count;
-        document.getElementById("keys").textContent =
-          "Nama cookie: " + data.cookies.join(", ");
-        resultBox.style.display = "block";
-      } catch (error) {
-        errorBox.textContent = "✕ " + error.message;
-        errorBox.style.display = "block";
-      } finally {
-        button.disabled = false;
-        button.textContent = "VALIDATE COOKIE";
-      }
-    });
+        if (!response.ok) {
+            throw new Error(data.error || 'Terjadi kesalahan sistem.');
+        }
 
-    document.getElementById("clearBtn").addEventListener("click", () => {
-      input.value = "";
-      errorBox.style.display = "none";
-      resultBox.style.display = "none";
-    });
-  </script>
+        // Tampilkan hasil sukses
+        statusBox.className = 'status ok';
+        statusBox.innerHTML = `
+            <strong>Berhasil!</strong><br>
+            Expires: ${data.expires}
+            <div class="result-box">
+                <a href="${data.url}" target="_blank">${data.url}</a>
+            </div>
+        `;
+
+    } catch (error) {
+        showStatus(error.message, 'err');
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'EKSTRAK TOKEN';
+    }
+});
+
+function showStatus(msg, type) {
+    statusBox.className = 'status ' + type;
+    statusBox.textContent = msg;
+}
+</script>
 </body>
 </html>
